@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CommunityCast — Live</title>
+  <meta name="description" content="Watch our community channel, live." />
+
+  <!-- EDIT THESE TWO to rebrand the site -->
+  <!-- Station name shown in the header and browser tab -->
+  <!-- Tagline shown under the header -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #08090b;
+      --bg-well: #020202;
+      --surface: #111318;
+      --surface-raised: #181b20;
+      --border: #22262c;
+      --border-strong: #2e333b;
+      --text: #e6e7e9;
+      --text-dim: #8b9099;
+      --text-faint: #52565e;
+      --on-air: #f0323a;
+      --on-air-dim: #f0323a26;
+      --on-air-glow: #f0323a4d;
+      --standby: #34b360;
+      --font-display: 'Barlow Condensed', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(155deg, var(--surface-raised), var(--bg-well));
+      border: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .brand-mark::after {
+      content: '';
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--standby);
+    }
+
+    .brand-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: 0.02em;
+    }
+
+    .tally {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+    }
+    .tally-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--border-strong);
+      transition: background 200ms ease, box-shadow 200ms ease;
+    }
+    .tally-dot.live {
+      background: var(--on-air);
+      box-shadow: 0 0 0 4px var(--on-air-dim), 0 0 14px 1px var(--on-air-glow);
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
+
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 40px 24px 60px;
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0 0 8px;
+    }
+
+    .subtitle {
+      color: var(--text-dim);
+      max-width: 620px;
+      line-height: 1.5;
+      margin: 0 0 28px;
+    }
+
+    .monitor {
+      position: relative;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px var(--border-strong), 0 4px 24px rgba(0, 0, 0, 0.5);
+      aspect-ratio: 16 / 9;
+    }
+    .monitor::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.025) 0px,
+        rgba(255, 255, 255, 0.025) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      mix-blend-mode: overlay;
+    }
+    .monitor video {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .offline-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--text-faint);
+      font-size: 14px;
+      z-index: 1;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .about {
+      margin-top: 48px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+      color: var(--text-dim);
+      line-height: 1.6;
+      max-width: 620px;
+      font-size: 14px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--text-faint);
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <span class="brand-name">CommunityCast</span>
+    </div>
+    <div class="tally">
+      <span class="tally-dot" id="tallyDot"></span>
+      <span id="tallyLabel">CHECKING…</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="eyebrow">Live Channel</div>
+    <h1>Watch Now</h1>
+    <p class="subtitle">
+      This is our community channel, streaming live. Programming runs continuously — check back
+      anytime.
+    </p>
+
+    <div class="monitor">
+      <video id="player" controls muted playsinline></video>
+      <div class="offline-overlay" id="offlineOverlay">
+        <span>&#128225;</span>
+        No broadcast right now — check back soon
+      </div>
+    </div>
+
+    <div class="status-row">
+      <span id="statusText" style="color: var(--text-dim); font-size: 13px;">Connecting…</span>
+    </div>
+
+    <div class="about">
+      <!-- EDIT: replace with your own station description -->
+      Community-run internet television, brought to you by local volunteers and neighbors.
+    </div>
+  </main>
+
+  <footer>COMMUNITYCAST</footer>
+
+  <script>
+    // EDIT THIS: your stream's HLS URL. Left as a relative path, this
+    // correctly resolves to wherever THIS page itself is being served from
+    // — so if you're hosting this page via CommunityCast's own public
+    // stream server (the same one serving /hls), you don't need to touch
+    // this at all, on your Mac's LAN or through DuckDNS alike. Only change
+    // it if you're hosting this HTML file somewhere else entirely.
+    const STREAM_URL = '/hls/index.m3u8';
+
+    const video = document.getElementById('player');
+    const tallyDot = document.getElementById('tallyDot');
+    const tallyLabel = document.getElementById('tallyLabel');
+    const statusText = document.getElementById('statusText');
+    const offlineOverlay = document.getElementById('offlineOverlay');
+
+    function setLive(isLive) {
+      tallyDot.classList.toggle('live', isLive);
+      tallyLabel.textContent = isLive ? 'ON AIR' : 'OFFLINE';
+      offlineOverlay.style.display = isLive ? 'none' : 'flex';
+      statusText.textContent = isLive ? 'Streaming live now.' : 'Not currently broadcasting.';
+    }
+
+    let hls = null;
+    let retryTimer = null;
+
+    function attach() {
+      if (Hls.isSupported()) {
+        hls = new Hls({ liveSyncDurationCount: 3 });
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          setLive(true);
+          video.play().catch(() => {});
+        });
+        hls.on(Hls.Events.ERROR, (_evt, data) => {
+          if (!data.fatal) return;
+          setLive(false);
+          if (retryTimer) clearTimeout(retryTimer);
+          // Same recovery pattern as the in-app preview: a failed load
+          // usually just means nothing is live yet, not a real error —
+          // keep quietly retrying rather than giving up.
+          retryTimer = setTimeout(() => hls.startLoad(), 3000);
+        });
+        hls.loadSource(STREAM_URL);
+        hls.attachMedia(video);
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Safari: native HLS support, no library needed
+        video.src = STREAM_URL;
+        video.addEventListener('loadedmetadata', () => {
+          setLive(true);
+          video.play().catch(() => {});
+        });
+        video.addEventListener('error', () => {
+          setLive(false);
+          setTimeout(() => { video.src = STREAM_URL; }, 3000);
+        });
+      } else {
+        statusText.textContent = 'Your browser does not support live video playback.';
+      }
+    }
+
+    attach();
+  </script>
+</body>
+</html>

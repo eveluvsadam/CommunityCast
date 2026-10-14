@@ -1,0 +1,81 @@
+{
+  "name": "communitycast",
+  "productName": "CommunityCast",
+  "version": "2.0.0",
+  "description": "Internet television channel & broadcast automation desktop app",
+  "main": "out/main/index.js",
+  "author": "CommunityCast",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "postinstall": "electron-rebuild -f -w better-sqlite3",
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "start": "electron-vite preview",
+    "dist:mac": "electron-vite build && electron-builder --mac",
+    "rtmp:test-server": "node scripts/rtmp-test-server.cjs"
+  },
+  "build": {
+    "appId": "com.communitycast.app",
+    "productName": "CommunityCast",
+    "files": [
+      "out/**/*",
+      "!out/**/*.map"
+    ],
+    "asarUnpack": [
+      "**/node_modules/ffmpeg-static/**",
+      "**/node_modules/ffprobe-static/**",
+      "**/node_modules/better-sqlite3/**"
+    ],
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "category": "public.app-category.video",
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "title": "CommunityCast ${version}"
+    },
+    "directories": {
+      "output": "dist"
+    }
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.5",
+    "express": "^5.3.0",
+    "ffmpeg-static": "^5.2.0",
+    "ffprobe-static": "^3.1.0",
+    "hls.js": "^1.7.3",
+    "lucide-react": "^1.57.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.4",
+    "socket.io": "^4.8.4",
+    "socket.io-client": "^4.8.4"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.2.1",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.6",
+    "@types/ffprobe-static": "^2.0.3",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "electron": "^44.7.2",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^6.0.0",
+    "node-media-server": "^2.7.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.4"
+  }
+}
