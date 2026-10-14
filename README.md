@@ -4,6 +4,15 @@ A macOS desktop app for running your own internet television channel — media
 library, program scheduler, live preview, and RTMP streaming/recording — with
 a broadcast-automation workflow modeled on real community TV stations.
 
+![Scheduler](docs/scheduler.png)
+
+<details>
+<summary>Media library</summary>
+
+![Media library](docs/media-library.png)
+
+</details>
+
 ## What's new in 2.0
 
 - **Modern, supported stack:** Electron 32 → 44, React 18 → 19, React Router 7,
@@ -47,6 +56,7 @@ and "Streaming beyond your local network" if you want an external RTMP
 destination too.
 
 Other scripts:
+- `npm test` — offline tests (playlist builder incl. a real ffmpeg run, formatters)
 - `npm run typecheck` — type-check main/preload and renderer separately
 - `npm run build` — production build to `out/`
 - `npm run dist:mac` — build + package a macOS app (packaging/signing beyond a stub is a later step)
